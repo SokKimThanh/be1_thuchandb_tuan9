@@ -13,10 +13,10 @@ class Product_DB extends Db
     /**
      * 1  danh sách sản phẩm
      */
-    public function select($currentPage, $perPage)
+    public function select()
     {
-        $startRecord = ($currentPage - 1) * $perPage;
-        $sql = self::$connection->prepare("SELECT * FROM products LIMIT $startRecord, $perPage");
+
+        $sql = self::$connection->prepare("SELECT * FROM products");
         if (!$sql->execute()) {
             throw new Exception("Thực thi sql không thành công!" . $sql->error);
             return;
@@ -71,13 +71,54 @@ class Product_DB extends Db
         return $list[0]['soluong'];
     }
 
-    function getPaginationBar($url, $total, $perPage)
+    function getPaginationBar($url, $total, $page, $perPage, $offset)
     {
-        $totalLinks = ceil($total / $perPage);
-        $link = "";
-        for ($j = 1; $j <= $totalLinks; $j++) {
-            $link = $link . "<a href='$url" . "page=$j'> $j </a>";
+        if ($total <= 0) {
+            return "";
         }
-        return $link;
+        $totalLinks = ceil($total / $perPage);
+
+        if ($totalLinks <= 1) {
+            return "";
+        }
+        // offset 
+        $from = $page - $offset;
+        $to = $page + $offset;
+        if ($from <= 0) {
+            $from = 1;
+            $to = $from + $offset * 2;
+        }
+
+        if ($to >= $totalLinks) {
+            $to = $totalLinks;
+        }
+
+
+        //các trang paginate 
+        $firstLink = "";
+        $prevLink = "";
+        $nextLink = "";
+        $lastLink = "";
+        if ($page > 1) {
+            $firstLink = "<li><a href='$url'> << </a></li>"; // <<
+            $prev = $page - 1;
+            $prevLink = "<li><a href='$url"/* $_SERVER['PHP_SELF'] . "?keyword={$keyword}&" */ . "page=$prev'> < </li>"; // <
+        }
+        if ($page < $totalLinks) {
+            $lastLink = "<li><a href='$url"/* $_SERVER['PHP_SELF'] . "?keyword={$keyword}&" */ . "page=$totalLinks'> >> </a></li>"; // >>
+            $next = $page + 1;
+            $nextLink = "<li><a href='$url"/* $_SERVER['PHP_SELF'] . "?keyword={$keyword}&" */ . "page=$next'> > </a></li>"; // >
+        }
+
+        $link = "";
+        // xử lý từ đến offset
+        for ($j = $from; $j <= $to; $j++) {
+            if ($j != $page) {
+                $link = $link . "<li><a href='$url" /* $_SERVER['PHP_SELF'] . "?keyword={$keyword}&" */ . "page=$j'> $j </a></li>";
+            } else {
+                $link = $link . "<li class='active'><a href='$url" /* $_SERVER['PHP_SELF'] . "?keyword={$keyword}&" */ . "page=$j'> $j </a></li>";
+            }
+        }
+        return $firstLink . $prevLink . $link . $nextLink . $lastLink;
     }
 }

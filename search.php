@@ -11,6 +11,9 @@ $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $total = $productDB->getSoLuong($keyword);
 // lấy đường dẫn đến file hiện hành
 $url = $_SERVER['PHP_SELF'] . "?keyword={$keyword}&";
+// hiển thị 5 trang offset
+$offset = 2;
+
 $searchList = $productDB->search($keyword, $page, $perPage);
 
 ?>
@@ -21,8 +24,6 @@ $searchList = $productDB->search($keyword, $page, $perPage);
 <body>
     <?php require_once('body_header.php'); ?>
 
-    <?php require_once('body_navigation.php') ?>
-
     <!-- SECTION -->
 
     <!-- /SECTION -->
@@ -31,31 +32,14 @@ $searchList = $productDB->search($keyword, $page, $perPage);
     <div class="section">
         <!-- container -->
         <div class="container">
-            <!-- store top filter -->
+            <!-- store bottom filter -->
             <div class="store-filter clearfix">
-                <div class="store-sort">
-                    <label>
-                        Sort By:
-                        <select class="input-select">
-                            <option value="0">Popular</option>
-                            <option value="1">Position</option>
-                        </select>
-                    </label>
-
-                    <label>
-                        Show:
-                        <select class="input-select">
-                            <option value="0">20</option>
-                            <option value="1">50</option>
-                        </select>
-                    </label>
-                </div>
-                <ul class="store-grid">
-                    <li class="active">1<i class="fa fa-th"></i></li>
-                    <li><a href="#">2<i class="fa fa-th-list"></i></a></li>
+                <span class="store-qty">Showing 20-100 products</span>
+                <ul class="store-pagination">
+                    <?php echo $productDB->getPaginationBar($url, $total, $page, $perPage, $offset) ?>
                 </ul>
             </div>
-            <!-- /store top filter -->
+            <!-- /store bottom filter -->
             <!-- row -->
             <div class="row">
                 <!-- Products tab & slick -->
@@ -105,20 +89,7 @@ $searchList = $productDB->search($keyword, $page, $perPage);
                 </div>
                 <!-- Products tab & slick -->
             </div>
-            <!-- store bottom filter -->
-            <?php echo $productDB->getPaginationBar($url, $total, $perPage) ?>
 
-            <div class="store-filter clearfix">
-                <span class="store-qty">Showing 20-100 products</span>
-                <ul class="store-pagination">
-                    <li class="active">1</li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5<i class="fa fa-angle-right"></i></a></li>
-                </ul>
-            </div>
-            <!-- /store bottom filter -->
             <!-- /row -->
         </div>
         <!-- /container -->
