@@ -3,28 +3,42 @@
 <?php
 require_once('header.php');
 require_once('model/product_db.php');
+require_once('model/category_db.php');
 $productdb = new Product_DB();
+$categorydb = new Category_DB();
+// Từ khóa tìm kiếm
+$keyword =  isset($_GET['keyword']) ? $_GET['keyword'] : '';
 
-// $keyword =  isset($_GET['keyword']) ? $_GET['keyword'] : '';
+// trả về loại sản phẩm đầu tiên nếu không có loại nào
+$category_id_selected = isset($_GET['category_id']) ? $_GET['category_id'] : 1;
+
+
+// giới hạn số trang hiển thị trên thanh phân trang
+$offset = 2;
 // hiển thị 5 sản phẩm trên 1 trang
-// $perPage = 3;
+$perPage = 3;
 // Lấy số trang trên thanh địa chỉ
-// $page = isset($_GET['page']) ? $_GET['page'] : 1;
+$currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
 // Tính tổng số dòng, ví dụ kết quả là 18
-// $total = $productDB->getSoLuong($keyword);
+$total = $productdb->selectSoLuongByLoaiSanPham($category_id_selected);
 // lấy đường dẫn đến file hiện hành
-// $url = $_SERVER['PHP_SELF'] . "?keyword={$keyword}&";
+$url = $_SERVER['PHP_SELF'] . "?category_id=$category_id_selected&";
 
-// $searchList = $productDB->search($keyword, $currentPage, $perPage);
+// danh sách sản phẩm phan trang
+$listSP_PhanTrang = $productdb->select($currentPage, $perPage, $category_id_selected);
+
+// danh sách loại sản phẩm
+$listDM = $categorydb->select();
+
 
 ?>
 
 <body>
     <?php
     require_once('body_header.php');
-    // require_once('body_navigation.php');
+    require_once('body_navigation.php');
     ?>
-     
+
     <!-- SECTION -->
     <div class="section">
         <!-- container -->
@@ -37,13 +51,9 @@ $productdb = new Product_DB();
 
                     <!-- store bottom filter -->
                     <div class="store-filter clearfix">
-                        <span class="store-qty">Showing 20-100 products</span>
+                        <!-- <span class="store-qty">Showing 20-100 products</span> -->
                         <ul class="store-pagination">
-                            <li class="active">1</li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5<i class="fa fa-angle-right"></i></a></li>
+                            <?php echo $productdb->getPaginationBar($url, $total, $currentPage, $perPage, $offset) ?>
                         </ul>
                     </div>
                     <!-- /store bottom filter -->
@@ -53,7 +63,8 @@ $productdb = new Product_DB();
                         <!-- product -->
                         <?php
 
-                        foreach ($productdb->select() as $key => $value) {
+
+                        foreach ($listSP_PhanTrang as $key => $value) {
                             echo "
                             <div class='col-md-4 col-xs-6'>
                             <div class='product'>
@@ -65,8 +76,8 @@ $productdb = new Product_DB();
                                     </div>
                                 </div>
                                 <div class='product-body'>
-                                    <p class='product-category'>Category</p>
-                                    <h3 class='product-name'><a href='#'>{$value['name']}</a></h3>
+                                    <p class='product-category'>{$value['cname']}</p>
+                                    <h3 class='product-name'><a href='#'>{$value['pname']}</a></h3>
                                     <h4 class='product-price'>$ {$value['price']} <del class='product-old-price'>$990.00</del></h4>
                                     <div class='product-rating'>
                                         <i class='fa fa-star'></i>

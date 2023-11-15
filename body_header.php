@@ -56,7 +56,7 @@ $categoryDB = new Category_DB();
                 </div>
                 <!-- /SEARCH BAR -->
 
-                 
+
             </div>
             <!-- row -->
         </div>

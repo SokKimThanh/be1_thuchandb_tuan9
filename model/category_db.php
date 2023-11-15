@@ -29,4 +29,22 @@ class Category_DB extends Db
         $sql->close();
         return $list;
     }
+
+    public function InDanhSachLoaiSP($keyword, $page, $category_id_selected)
+    {
+
+        $list = $this->select();
+        $result = "";
+        $page = 1;
+        foreach ($list as $row => $value) {
+            $category_id = $value['id'];
+            $href = "{$_SERVER['PHP_SELF']}?category_id={$category_id}&page={$page}";
+            if ($value['id'] != $category_id_selected) {
+                $result .= "" . "<li><a href='$href'>{$value['name']}</a></li>" . "";
+            } else {
+                $result .= "" . "<li class='active'><a href='$href'>{$value['name']}</a></li>" . "";
+            }
+        }
+        return $result;
+    }
 }
